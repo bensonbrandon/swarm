@@ -1,0 +1,12 @@
+allMean = zeros(4,8);
+allStd = zeros(4,8);
+for n = 1:8
+    load(strcat('n100_bp',num2str(n),'_run1.mat'))
+    eval(strcat('x = n100_bp',num2str(n),'_r_r;'))
+    [mean,std] = allMeanStdgetMS(x);
+    allMean(1,n) = mean;
+    allStd(1,n) = std;
+    
+end
+
+
