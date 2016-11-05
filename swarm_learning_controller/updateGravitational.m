@@ -1,16 +1,16 @@
-function [ Xnew, Ynew, Vxnew,Vynew,objFunc, takenAgentsTargets ] = updateGravitational( Px,Py,Vx,Vy,Tx,Ty,b,c,forceF,controlF,agentSize,takenAgentsTargets )
+function [ agents, objFunc, takenAgentsTargets ] = updateGravitational( agents,Tx,Ty,b,c,forceF,controlF,agentSize,takenAgentsTargets )
 %X,Y are the current positions of agents
 %Tx,Ty are the positions of the targets
 %this function uses a graviational potential as an objective function
 %where all agents repel each other and targets attract them
 %metropolis monte carlo is used to minimize the objective function
 
-%shake = agentSize/10;
 shake = .005;
-Xnew = Px;
-Ynew = Py;
-Vxnew = Vx;
-Vynew = Vy;
+Xnew = agents{1};
+Ynew = agents{2};
+Vxnew = agents{3};
+Vynew = agents{4};
+P = agents{5};
 minDistances = Inf*ones(1,length(Tx)); %minimum distance from any agent to the targets
 for a = 1:length(takenAgentsTargets(:,2))
     if takenAgentsTargets(a,2) == 1
@@ -68,14 +68,17 @@ for i = randperm(length(Xnew))
     if takenAgentsTargets(i,1) == 1
         continue
     end
+    [xnew,ynew,vxnew,vynew,pnew] = controlF(x,y,vx,vy,forceTx,forceTy,forceAx,forceAy,P(i,:),c,b,shake);
     
-    Xnew(i) = 1/(b+1) *c*controlF(forceTx,forceAx,i) + x + (1/(b+1))*Vx(i) + shake*(rand-.5);
-    Ynew(i) = 1/(b+1) *c*controlF(forceTy,forceAy,i) + y + (1/(b+1))*Vy(i) + shake*(rand-.5);
-    Vxnew(i) = Xnew(i) - x;
-    Vynew(i) = Ynew(i) - y;
+    
     
 end
 objFunc = sum(minDistances);
+agents{1} = Xnew;
+agents{2} = Ynew;
+agents{3} = Vxnew;
+agents{4} = Vynew;
+agents{5} = P;
 end
 
 

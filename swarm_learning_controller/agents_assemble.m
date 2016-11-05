@@ -43,7 +43,7 @@ else
 end
 
 forceFunction = @(x) localityFunction(x,agentSize,lambda);
-controlFunction = @(ft,fa,i) agentController(ft,fa,P,i);
+controlFunction = @(ft,fa,P) agentController(ft,fa,P);
 
 figure('units','normalized','position',[.05,.1,.9,.65]);
 subplot(2,2,[1 3])
@@ -72,7 +72,7 @@ for i = 1:length(locF)
     locF(i) = forceFunction(d(i));
 end
 for j = 1:length(contF)
-    contF(j) = controlFunction(forceFunction(df(j)),0,1);
+    contF(j) = controlFunction(forceFunction(df(j)),0,P(1,:));
 end
 hold on
 plot(d,locF,'b')
@@ -88,7 +88,7 @@ i = 1;
 while percentComplete < 1
     i = i + 1;
 
-    [Px,Py,Vx,Vy,~,takenAgentsTargets] = updateGravitational(Px,Py,Vx,Vy,Tx,Ty,b,c,forceFunction,controlFunction,agentSize,takenAgentsTargets);
+    [Px,Py,Vx,Vy,P,~,takenAgentsTargets] = updateGravitational(Px,Py,Vx,Vy,P,Tx,Ty,b,c,forceFunction,controlFunction,agentSize,takenAgentsTargets);
     percentComplete = [percentComplete; sum(takenAgentsTargets(:,2))/N];
     subplot(2,2,2)
     addpoints(m,i,percentComplete(i));
