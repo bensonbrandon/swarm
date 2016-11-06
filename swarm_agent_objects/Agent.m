@@ -9,31 +9,36 @@ classdef Agent<handle
     properties
         pos %[positionX,positionY] vector
         vel %[velocityX,velocityY] vector
-        cont %controller parameter
-        loc %locaity function handle, typically 1/r
         
         b %from environment variable [b,c,shake,color,size] 
         c %b,c are parameters for damping and force amplitude
         shake
         color %used for identifying allies and enemies
         size %size of an agent, typically .02
+        fixed
+        initialState
+        contParaUpdate
     end
     
     methods
-        function obj = Agent(pos,vel,cont,loc,envir)
+        function obj = Agent(pos,vel,cont,envir)
             obj.pos = pos;
             obj.vel = vel;
-            obj.cont = cont;
-            obj.loc = loc;
             obj.b = envir(1);
             obj.c = envir(2);
             obj.shake = envir(3);
             obj.color = envir(4);
             obj.size = envir(5);
-            
+            obj.fixed = 0;
+            obj.initialState = {pos,vel}; %initPos,initVel
+            obj.contParaUpdate = {0,cont,Inf,cont}; %stepN, cont, laststepN, lastCont
         end
         
         function obj = step(obj,infoAlly,infoEnemy)
+            if obj.fixed
+                return
+            end
+            obj.contParaUpdate{1} = obj.contParaUpdate{1} + 1;
             infoAx = infoAlly(1);
             infoAy = infoAlly(2);
             infoEx = infoEnemy(1);
@@ -52,9 +57,9 @@ classdef Agent<handle
             forcex = abs(forcex);
             maxf = 1;
             if forcex > maxf
-                forcex = obj.cont(end);
+                forcex = obj.contParaUpdate{2}(end);
             else
-                forcex = interp1(linspace(0,maxf,length(obj.cont)),obj.cont,forcex);
+                forcex = interp1(linspace(0,maxf,length(obj.contParaUpdate{2})),obj.contParaUpdate{2},forcex);
             end
             forcex = sgn*forcex;
             
@@ -63,9 +68,9 @@ classdef Agent<handle
             forcey = abs(forcey);
             maxf = 1;
             if forcey > maxf
-                forcey = obj.cont(end);
+                forcey = obj.contParaUpdate{2}(end);
             else
-                forcey = interp1(linspace(0,maxf,length(obj.cont)),obj.cont,forcey);
+                forcey = interp1(linspace(0,maxf,length(obj.contParaUpdate{2})),obj.contParaUpdate{2},forcey);
             end
             forcey = sgn*forcey;
             
@@ -80,7 +85,39 @@ classdef Agent<handle
             obj.pos = [xnew,ynew];
             
         end
+        
+        function obj = fix(obj,position)
+            %if this is called, the object cannot move for the remainder of
+            %the simulation
+            obj.fixed = 1;
+            obj.pos = position;
             
+            %automatically update the controller based on the information
+            %that it recieved.
+            
+            stepN = obj.contParaUpdate{1};
+            control = obj.contParaUpdate{2};
+            lastStepN = obj.contParaUpdate{3};
+            lastControl = obj.contParaUpdate{4};
+            pertControl = .01*rand(1,100);
+            if stepN < lastStepN
+            	obj.contParaUpdate{3} = stepN; %update last steps
+                obj.contParaUpdate{4} = control; %update last cont
+                obj.contParaUpdate{1} = 0;
+                %random permutation of control parameters.
+                
+                obj.contParaUpdate{2} = obj.contParaUpdate{2} + pertControl;
+            else
+                obj.contParaUpdate{1} = 0;
+                obj.contParaUpdate{2} = lastControl + pertControl;
+            end
+        end
+        
+        function obj = reset(obj)
+            obj.fixed = 0;
+            obj.pos = obj.initialState{1};
+            obj.vel = obj.initialState{2};
+        end
     end
     
 end

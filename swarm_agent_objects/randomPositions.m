@@ -18,8 +18,8 @@ while length(X)<N
         end
     end
     if ~overlap
-        X = [X x];
-        Y = [Y y];
+        X = [X; x];
+        Y = [Y; y];
     end
 end
 
