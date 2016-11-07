@@ -7,6 +7,9 @@ for i = 1:length(agents)
     infoA = [0 0];
     infoE = [0 0];
     
+    minDist = Inf;
+    minAgent = 0;
+    
     for j = 1:length(agents)
         if i ~= j
             other = agents(j);
@@ -16,14 +19,21 @@ for i = 1:length(agents)
                 infoA = [infoA(1) + infox,infoA(2) + infoy];
             else
                 infoE = [infoE(1) + infox,infoE(2) + infoy];
-                if dist<agent.size && agent.fixed==0 && other.fixed==0
-                    agent.fix(agent.pos)
-                    other.fix(agent.pos)
+                if dist<minDist
+                    minDist = dist;
+                    minAgent = j;
                 end
             end
             
         end
     end
+if minDist<agent.size && agent.fixed==0
+    other = agents(minAgent);
+    if other.fixed==0
+        agent.fix(agent.pos);
+        other.fix(agent.pos);
+    end
+end
 agent.step(infoA,infoE);
 end
     

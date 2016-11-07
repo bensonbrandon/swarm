@@ -1,6 +1,6 @@
 clear all
 close all
-%hi
+
 P = linspace(0,1,100);
 P = P.^.5;
 N = 100; %number of agents
@@ -63,19 +63,21 @@ xlabel('Time Steps')
 ylabel('Percent of Targets Found')
 set(subplot(2,2,2),'Color','w')
 m = animatedline('Color','k');
-%{
+
 subplot(2,2,4)
 
 d = 0:.001:1;
 locF = zeros(1,length(d));
 df = agentSize:.001:1;
-contF = zeros(1,length(df));
+contlocF = zeros(1,length(df));
 for i = 1:length(locF)
-    locF(i) = loc(d(i));
+    locF(i) = loc([0 0],[d(i) 0]);
 end
-for j = 1:length(contF)
-    contF(j) = controlFunction(loc(df(j)),0,1);
+for i = 1:length(contlocF)
+    contlocF(i) = loc([0 0],[df(i) 0]);
 end
+
+contF = interp1(linspace(0,1,N),P,contlocF);
 hold on
 plot(d,locF,'b')
 plot(df,contF,'r')

@@ -99,7 +99,7 @@ classdef Agent<handle
             control = obj.contParaUpdate{2};
             lastStepN = obj.contParaUpdate{3};
             lastControl = obj.contParaUpdate{4};
-            pertControl = .01*rand(1,100);
+            pertControl = .1*(.5-rand(1,100));
             if stepN < lastStepN
             	obj.contParaUpdate{3} = stepN; %update last steps
                 obj.contParaUpdate{4} = control; %update last cont
