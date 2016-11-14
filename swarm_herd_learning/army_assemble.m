@@ -2,7 +2,9 @@ clear all
 close all
 
 
-N = 50; %number of agents
+%N = 50; %number of agents
+Np0 = 100;
+Np1 = 10;
 P = linspace(0.01,1,100);
 P = (P).^.5;
 
@@ -10,14 +12,15 @@ agentSize = .02;
 shake = .005;
 b = .2;
 c = agentSize;
-lambda = 1; %locality parameter, power of decay (1/r)^lambda
+lambda = 2; %locality parameter, power of decay (1/r)^lambda
 
-theta = linspace(0,2*pi,N+1)';
+thetap = linspace(0,2*pi,Np0+1)';
+thetat = linspace(0,2*pi,Np1+1)';
 
-Px = .05.*cos(theta(1:end-1)) +.1;
-Py = .4.*sin(theta(1:end-1))+.5;
-Tx = .05.*cos(theta(1:end-1)) +.9;
-Ty = .4.*sin(theta(1:end-1))+.5;
+Px0 = .4.*cos(thetap(1:end-1)) +.5;
+Py0 = .4.*sin(thetap(1:end-1))+.5;
+Px1 = .35.*cos(thetat(1:end-1)) +.5;
+Py1 = .35.*sin(thetat(1:end-1))+.5;
 
 loc = @(posA,posO) localityFunction(posA,posO,agentSize,lambda);
 
@@ -25,33 +28,31 @@ loc = @(posA,posO) localityFunction(posA,posO,agentSize,lambda);
 %   create an array of agents
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 agents = [];
-for i = 1:N
-    agents = [agents ArmyAgent([Px(i),Py(i)],[0,0],P,[b,c,shake,0,agentSize])];
+for i = 1:Np0
+    agents = [agents ArmyAgent([Px0(i),Py0(i)],[0,0],[b,c,shake,0,agentSize])];
 end
-for j = 1:N
-    agents = [agents ArmyAgent([Tx(j),Ty(j)],[0,0],P,[b,c,shake,1,agentSize])];
+for j = 1:Np1
+    agents = [agents ArmyAgent([Px1(j),Py1(j)],[0,0],[b,c,shake,1,agentSize])];
 end
- 
-Px = [Px;Tx];
-Py = [Py;Ty];
 
 figure('units','normalized','position',[.05,.1,.9,.65]);
 subplot(2,2,[1 3])
 set(subplot(2,2,[1 3]),'Color','k')
 title('Swarm Simulation')
 hold on
-h(1) = scatter(Px(end/2 +1:end),Py(end/2 +1:end),'r');
-h(2) = scatter(Px(1:end/2),Py(1:end/2),'hexagram','MarkerFaceColor','b','MarkerEdgeColor','w');
-for j = 1:length(Px)
+h(1) = scatter(Px1,Py1,'r');
+h(2) = scatter(Px0,Py0,'hexagram','MarkerFaceColor','b','MarkerEdgeColor','w');
+for j = 1:(Np0+Np1)
     g(j) = animatedline('Color','c');
 end
+%{
 subplot(2,2,2)
 title('Percent Complete')
 xlabel('Time Steps')
 ylabel('Percent of Targets Found')
 set(subplot(2,2,2),'Color','w')
 m = animatedline('Color','k');
-
+%}
 subplot(2,2,4)
 
 d = 0:.001:1;
@@ -80,24 +81,33 @@ i = 1;
 while percentComplete < 1
     i = i + 1;
 
-    [Px,Py, percentComp] = updateArmys(agents,loc);
-    percentComplete = [percentComplete; percentComp];
-    subplot(2,2,2)
-    addpoints(m,i,percentComplete(i));
-
-
+    updateArmys(agents,loc,P);
+    percentComplete = 0;
+    %percentComplete = [percentComplete; percentComp];
+    %subplot(2,2,2)
+    %addpoints(m,i,percentComplete(i));
+    
+    [Px0,Py0,Px1,Py1] = army_positions(agents);
+    
+    
     subplot(2,2,[1 3])
-    h(2*i-1) = scatter(Px(end/2 +1:end),Py(end/2 +1:end),'r');
-    h(2*i) = scatter(Px(1:end/2),Py(1:end/2),'hexagram','MarkerFaceColor','b','MarkerEdgeColor','w');
+    h(2*i-1) = scatter(Px1,Py1,'r');
+    h(2*i) = scatter(Px0,Py0,'hexagram','MarkerFaceColor','b','MarkerEdgeColor','w');
+    
     if ishandle(h(2*i-3))
         delete(h(2*i-3));
         delete(h(2*i-2));
     end
-    for j = 1:length(Px)
-        addpoints(g(j),Px(j),Py(j))
+    j = 0;
+    while j < length(agents)
+        j = j+1;
+        if j <= Np0
+            addpoints(g(j),Px0(j),Py0(j))
+        else
+            addpoints(g(j),Px1(j-Np0),Py1(j-Np0))
+        end
     end
-    %drawnow;
-    
+        
     if floor(i/50) == i/50
         drawnow;
     end

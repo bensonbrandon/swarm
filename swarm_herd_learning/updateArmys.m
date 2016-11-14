@@ -1,4 +1,4 @@
-function [ Px,Py,percentComplete ] = updateArmys( agents, loc )
+function [] = updateArmys( agents, loc, P )
 %Update performs a step of all the agents based on the environment
 %if agents are within a .1x.1 square, then there is a chance that some will
 %die proportional to the number of agents in that square
@@ -21,6 +21,13 @@ for i = randperm(length(agents))
             end
         end
     end
+[forcex,forcey] = control(agent,infoA,infoE,P);
+
+agent.step(forcex,forcey);
+end
+end
+
+function [forcex,forcey] = control(agent,infoA,infoE,P)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %   convert info to force 
 %   (maps interval (0,1) in info to (0,1) in force)
@@ -29,40 +36,24 @@ infoAy = infoA(2);
 infoEx = infoE(1);
 infoEy = infoE(2);
 
-forcex = infoEx - infoAx;
-sgn = sign(forcex);
-forcex = abs(forcex);
-maxf = 1;
-if forcex > maxf
-    forcex = agent.contParaUpdate{2}(end);
+if agent.color == 1 %red wants to get away from everyone
+    forcex = -infoEx - infoAx;
+    forcey = -infoEy - infoAy;
 else
-    forcex = interp1(linspace(0,maxf,length(agent.contParaUpdate{2})),agent.contParaUpdate{2},forcex);
+    forcex = infoEx;
+    forcey = infoEy;
 end
-forcex = sgn*forcex;
+force = (forcex^2 + forcey^2)^.5;
 
-forcey = infoEy - infoAy;
-sgn = sign(forcey);
-forcey = abs(forcey);
 maxf = 1;
-if forcey > maxf
-    forcey = agent.contParaUpdate{2}(end);
+if force > maxf
+    outForce = P(end);
 else
-    forcey = interp1(linspace(0,maxf,length(agent.contParaUpdate{2})),agent.contParaUpdate{2},forcey);
+    outForce = interp1(linspace(0,maxf,length(P)),P,force);
 end
-forcey = sgn*forcey;
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-agent.step(forcex,forcey);
-end
+scale = outForce/force;
+forcex = scale*forcex;
+forcey = scale*forcey;
     
-percentComplete = 0;
-
-Px = zeros(length(agents),1);
-Py = zeros(length(agents),1);
-for k = 1:length(agents)
-    agent = agents(k);
-    Px(k) = agent.pos(1);
-    Py(k) = agent.pos(2);
-end
 end
 

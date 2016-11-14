@@ -17,11 +17,10 @@ classdef ArmyAgent<handle
         size %size of an agent, typically .02
         fixed
         initialState
-        contParaUpdate
     end
     
     methods
-        function obj = ArmyAgent(pos,vel,cont,envir)
+        function obj = ArmyAgent(pos,vel,envir)
             obj.pos = pos;
             obj.vel = vel;
             obj.b = envir(1);
@@ -31,14 +30,14 @@ classdef ArmyAgent<handle
             obj.size = envir(5);
             obj.fixed = 0;
             obj.initialState = {pos,vel}; %initPos,initVel
-            obj.contParaUpdate = {0,cont,Inf,cont}; %stepN, cont, laststepN, lastCont
+            %obj.contParaUpdate = {0,cont,Inf,cont}; %stepN, cont, laststepN, lastCont
         end
         
         function obj = step(obj,forcex,forcey)
             if obj.fixed
                 return
             end
-            obj.contParaUpdate{1} = obj.contParaUpdate{1} + 1;
+            %obj.contParaUpdate{1} = obj.contParaUpdate{1} + 1;
             x = obj.pos(1);
             y = obj.pos(2);
             vx = obj.vel(1);
@@ -61,26 +60,6 @@ classdef ArmyAgent<handle
             %the simulation
             obj.fixed = 1;
             obj.pos = position;
-            
-            %automatically update the controller based on the information
-            %that it recieved.
-            
-            stepN = obj.contParaUpdate{1};
-            control = obj.contParaUpdate{2};
-            lastStepN = obj.contParaUpdate{3};
-            lastControl = obj.contParaUpdate{4};
-            pertControl = .1*(.5-rand(1,length(control)));
-            if stepN < lastStepN
-            	obj.contParaUpdate{3} = stepN; %update last steps
-                obj.contParaUpdate{4} = control; %update last cont
-                obj.contParaUpdate{1} = 0;
-                %random permutation of control parameters.
-                
-                obj.contParaUpdate{2} = obj.contParaUpdate{2} + pertControl;
-            else
-                obj.contParaUpdate{1} = 0;
-                obj.contParaUpdate{2} = lastControl + pertControl;
-            end
         end
         
         function obj = reset(obj)
