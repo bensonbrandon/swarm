@@ -1,4 +1,4 @@
-classdef Agent<handle
+classdef ArmyAgent<handle
     %AGENT a unit that interacts with others through force and internal
     %control
     %   Agents have positions and velocity in space.  they are also feel
@@ -21,7 +21,7 @@ classdef Agent<handle
     end
     
     methods
-        function obj = Agent(pos,vel,cont,envir)
+        function obj = ArmyAgent(pos,vel,cont,envir)
             obj.pos = pos;
             obj.vel = vel;
             obj.b = envir(1);
@@ -34,49 +34,19 @@ classdef Agent<handle
             obj.contParaUpdate = {0,cont,Inf,cont}; %stepN, cont, laststepN, lastCont
         end
         
-        function obj = step(obj,infoAlly,infoEnemy)
+        function obj = step(obj,forcex,forcey)
             if obj.fixed
                 return
             end
             obj.contParaUpdate{1} = obj.contParaUpdate{1} + 1;
-            infoAx = infoAlly(1);
-            infoAy = infoAlly(2);
-            infoEx = infoEnemy(1);
-            infoEy = infoEnemy(2);
             x = obj.pos(1);
             y = obj.pos(2);
             vx = obj.vel(1);
             vy = obj.vel(2);
             
-            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-            %   convert info to force 
-            %   (maps interval (0,1) in info to (0,1) in force)
-            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-            forcex = infoEx - infoAx;
-            sgn = sign(forcex);
-            forcex = abs(forcex);
-            maxf = 1;
-            if forcex > maxf
-                forcex = obj.contParaUpdate{2}(end);
-            else
-                forcex = interp1(linspace(0,maxf,length(obj.contParaUpdate{2})),obj.contParaUpdate{2},forcex);
-            end
-            forcex = sgn*forcex;
-            
-            forcey = infoEy - infoAy;
-            sgn = sign(forcey);
-            forcey = abs(forcey);
-            maxf = 1;
-            if forcey > maxf
-                forcey = obj.contParaUpdate{2}(end);
-            else
-                forcey = interp1(linspace(0,maxf,length(obj.contParaUpdate{2})),obj.contParaUpdate{2},forcey);
-            end
-            forcey = sgn*forcey;
-            
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             %   update position
-            %   (uses calculated forces and environment parameters to
+            %   (uses forces and environment parameters to
             %   update position and velocity vectors)
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             xnew = 1/(obj.b+1) *obj.c*forcex + x + (1/(obj.b+1))*vx + obj.shake*(rand-.5);
@@ -84,7 +54,7 @@ classdef Agent<handle
             obj.vel = [xnew - x, ynew - y];
             obj.pos = [xnew,ynew];
             
-        end
+        end    
         
         function obj = fix(obj,position)
             %if this is called, the object cannot move for the remainder of

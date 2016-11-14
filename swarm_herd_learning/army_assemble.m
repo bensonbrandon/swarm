@@ -4,34 +4,21 @@ close all
 
 N = 50; %number of agents
 P = linspace(0.01,1,100);
-P = (N*P).^-1;
+P = (P).^.5;
 
 agentSize = .02;
 shake = .005;
 b = .2;
 c = agentSize;
 lambda = 1; %locality parameter, power of decay (1/r)^lambda
-circleAgents = 0;
-ra = 0.45;
-circleTargets = 0;
-rt = .20;
-
 
 theta = linspace(0,2*pi,N+1)';
 
-if circleAgents
-    Px = ra.*cos(theta(1:end-1)) +.5;
-    Py = ra.*sin(theta(1:end-1))+.5;
-else
-    [Px,Py] = randomPositions(N,agentSize);
-end
+Px = .05.*cos(theta(1:end-1)) +.1;
+Py = .4.*sin(theta(1:end-1))+.5;
+Tx = .05.*cos(theta(1:end-1)) +.9;
+Ty = .4.*sin(theta(1:end-1))+.5;
 
-if circleTargets>0
-    Tx = rt.*cos(theta(1:end-1)) +.5;
-    Ty = rt.*sin(theta(1:end-1))+.5;
-else
-    [Tx,Ty] = randomPositions(N,agentSize);
-end
 loc = @(posA,posO) localityFunction(posA,posO,agentSize,lambda);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -39,10 +26,10 @@ loc = @(posA,posO) localityFunction(posA,posO,agentSize,lambda);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 agents = [];
 for i = 1:N
-    agents = [agents Agent([Px(i),Py(i)],[0,0],P,[b,c,shake,0,agentSize])];
+    agents = [agents ArmyAgent([Px(i),Py(i)],[0,0],P,[b,c,shake,0,agentSize])];
 end
 for j = 1:N
-    agents = [agents Agent([Tx(j),Ty(j)],[0,0],P,[b,c,shake,1,agentSize])];
+    agents = [agents ArmyAgent([Tx(j),Ty(j)],[0,0],P,[b,c,shake,1,agentSize])];
 end
  
 Px = [Px;Tx];
@@ -93,7 +80,7 @@ i = 1;
 while percentComplete < 1
     i = i + 1;
 
-    [Px,Py, percentComp] = updateAgents(agents,loc);
+    [Px,Py, percentComp] = updateArmys(agents,loc);
     percentComplete = [percentComplete; percentComp];
     subplot(2,2,2)
     addpoints(m,i,percentComplete(i));

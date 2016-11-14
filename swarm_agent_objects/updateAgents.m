@@ -1,7 +1,7 @@
 function [ Px,Py,percentComplete ] = updateAgents( agents, loc )
 %Update performs a step of all the agents based on the environment
 
-for i = 1:length(agents)
+for i = randperm(length(agents))
     agent = agents(i);
     posAgent = agent.pos;
     infoA = [0 0];
