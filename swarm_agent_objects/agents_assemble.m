@@ -4,7 +4,7 @@ close all
 
 N = 50; %number of agents
 P = linspace(0.01,1,100);
-P = (N*P).^-1;
+%P = (N*P).^-1;
 
 agentSize = .02;
 shake = .005;
@@ -13,7 +13,7 @@ c = agentSize;
 lambda = 1; %locality parameter, power of decay (1/r)^lambda
 circleAgents = 0;
 ra = 0.45;
-circleTargets = 0;
+circleTargets = 1;
 rt = .20;
 
 

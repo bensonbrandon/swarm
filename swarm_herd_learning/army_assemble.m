@@ -5,8 +5,7 @@ close all
 %N = 50; %number of agents
 Np0 = 100;
 Np1 = 10;
-P = linspace(0.01,1,100);
-P = (P).^.5;
+P = linspace(0,1,100);
 
 agentSize = .02;
 shake = .005;
@@ -78,15 +77,11 @@ ylabel('amplitude')
 %takenAgentsTargets = zeros(length(Tx),2);
 percentComplete = [0];
 i = 1;
-while percentComplete < 1
-    i = i + 1;
+while i < 101
+    i = i + 1
 
-    updateArmys(agents,loc,P);
-    percentComplete = 0;
-    %percentComplete = [percentComplete; percentComp];
-    %subplot(2,2,2)
-    %addpoints(m,i,percentComplete(i));
-    
+    updateArmys(agents,loc,@neuralControl);
+        
     [Px0,Py0,Px1,Py1] = army_positions(agents);
     
     
