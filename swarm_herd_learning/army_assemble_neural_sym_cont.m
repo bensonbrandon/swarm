@@ -4,7 +4,7 @@ close all
 
 %N = 50; %number of agents
 Np0 = 100;
-Np1 = 10;
+Np1 = 100;
 %control parameters E, then A
 %{
 W2 = [-.5,0,1,0,0,0,0,0,0;0,-.5,0,1,0,0,0,0,0];
@@ -24,8 +24,8 @@ thetat = linspace(0,2*pi,Np1+1)';
 
 Px0 = .4.*cos(thetap(1:end-1)) +.5;
 Py0 = .4.*sin(thetap(1:end-1))+.5;
-%Px1 = .25.*cos(thetat(1:end-1)) +.5;
-%Py1 = .25.*sin(thetat(1:end-1))+.5;
+Px1 = .25.*cos(thetat(1:end-1)) +.5;
+Py1 = .25.*sin(thetat(1:end-1))+.5;
 
 loc = @(posA,posO) localityFunction(posA,posO,agentSize,lambda);
 
@@ -56,13 +56,13 @@ for j = 1:(Np0+Np1)
     g(j) = animatedline('Color','c');
 end
 
-
+pause(15);
 percentComplete = 0;
 infoAold = [0,0];
 infoEold = [0,0];
 i = 1;
 Error = 0;
-while percentComplete<1 && i<201
+while percentComplete<1 && i<301
     i = i + 1
     Error
     

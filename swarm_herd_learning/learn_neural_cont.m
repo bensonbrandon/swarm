@@ -6,7 +6,7 @@ W2 = [-.5,0,1,0,0,0,0,0,0;0,-.5,0,1,0,0,0,0,0];
 W1 = [eye(8),zeros(8,1)];
 Wparent1 = W1;
 Wparent2 = W2;
-
+load('Wparent_neur_cont_after50.mat')
 
 for generation = 1:10
     generation

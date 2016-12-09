@@ -56,13 +56,15 @@ for j = 1:(Np0+Np1)
     g(j) = animatedline('Color','c');
 end
 
-
+if z == 1
+    pause(15);
+end
 percentComplete = 0;
 infoAold = [0,0];
 infoEold = [0,0];
 i = 1;
 error = 0;
-while percentComplete<1 && i<81
+while percentComplete<1 && i<101
     i = i + 1
     error
     

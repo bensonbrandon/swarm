@@ -16,7 +16,7 @@ Wparent2 = W2;
 %Wparent2 = W{2};
 load('Wparent_neur_sym_cont_after170')
 
-for generation = 1:30
+for generation = 1:1
     
     Wparent1;
     WnextGen1 = zeros([size(Wparent1),5]);
@@ -27,10 +27,11 @@ mom = 0;
 momError = Inf;
 dad = 0;
 dadError = Inf;
-for z = 1:5
+for z = 1:1
     %randW1 = [repelem(rand(8,4),1,2),rand(8,1)]; %make it symmetric
     generation
-    W = {Wparent1+.05*(rand(8,7)-.5),Wparent2+.05*(rand(2,9)-.5)};
+    %W = {Wparent1+.05*(rand(8,7)-.5),Wparent2+.05*(rand(2,9)-.5)};
+    W = {Wparent1,Wparent2};
     army_assemble_neural_sym_cont;
     WnextGen1(:,:,z) = W{1};
     WnextGen2(:,:,z) = W{2};
